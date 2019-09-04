@@ -1,13 +1,16 @@
 package com.se.stories.dao
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.se.stories.TestUtil.Companion.testStory1
+import com.se.stories.TestUtil.Companion.testStory2
+import com.se.stories.TestUtil.Companion.testStory3
+import com.se.stories.TestUtil.Companion.testUser1
+import com.se.stories.TestUtil.Companion.testUser2
+import com.se.stories.TestUtil.Companion.testUser3
 import com.se.stories.data.db.StoriesDao
-import com.se.stories.data.db.UserDao
 import com.se.stories.data.db.entities.StoryEntity
 import com.se.stories.data.db.entities.UserEntity
 import junit.framework.Assert.assertEquals
-import org.junit.After
-import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 
