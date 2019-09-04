@@ -6,6 +6,7 @@ import android.view.View
 import android.widget.Toast
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.test.espresso.idling.CountingIdlingResource
 import com.se.stories.R
 import com.se.stories.adapter.StoryAdapter
 import com.se.stories.data.db.entities.StoryEntity
@@ -31,6 +32,8 @@ class StoriesActivity : AppCompatActivity() {
 
     private val connectivityModule: ConnectivityModule by inject()
 
+    val countingIdlingResource = CountingIdlingResource("async_operations")
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_stories)
@@ -40,7 +43,7 @@ class StoriesActivity : AppCompatActivity() {
         initStoryItemClick()
         initLiveDataObservers()
 
-        viewmodel.fetchStories()
+        fetchStories()
     }
 
     override fun onDestroy() {
@@ -67,6 +70,7 @@ class StoriesActivity : AppCompatActivity() {
                         Timber.e(livedataWrapper.exception, "Error fetching items")
 
                         displayItemsError()
+                        countingIdlingResource.decrement()
                     }
 
                     ResourceStatus.SUCCESS -> {
@@ -86,6 +90,7 @@ class StoriesActivity : AppCompatActivity() {
                         empty_list_text_view.visibility = View.GONE
 
                         stories_recycler_view.smoothScrollToPosition(viewmodel.scrollPosition)
+                        countingIdlingResource.decrement()
                     }
                 }
         })
@@ -120,6 +125,11 @@ class StoriesActivity : AppCompatActivity() {
         empty_list_text_view.visibility = View.VISIBLE
     }
 
+    private fun fetchStories(forceRefresh: Boolean = false) {
+        countingIdlingResource.increment()
+        viewmodel.fetchStories(forceRefresh)
+    }
+
     /* Section - UI Handlers */
 
     /**
@@ -135,7 +145,7 @@ class StoriesActivity : AppCompatActivity() {
     private fun initSwipeToRefresh() {
         swipe_refresh_layout.setOnRefreshListener {
             viewmodel.scrollPosition = 0
-            viewmodel.fetchStories(true)
+            fetchStories(true)
         }
     }
 
