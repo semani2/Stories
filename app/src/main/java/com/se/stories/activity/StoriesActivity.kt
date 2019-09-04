@@ -89,6 +89,27 @@ class StoriesActivity : AppCompatActivity() {
                     }
                 }
         })
+
+        viewmodel.availableOfflineLiveData.observe(this,
+            Observer<LiveDataWrapper<Boolean, Exception>> { livedataWrapper ->
+                when (livedataWrapper.status) {
+                    ResourceStatus.LOADING -> {}
+
+                    ResourceStatus.ERROR -> {}
+
+                    ResourceStatus.SUCCESS -> {
+                        if (livedataWrapper.data != null && livedataWrapper.data) {
+                            Toast.makeText(this, getString(R.string.str_available_offline),
+                                Toast.LENGTH_LONG).show()
+                            viewmodel.availableOfflineLiveData.value = LiveDataWrapper(
+                                ResourceStatus.SUCCESS,
+                                false,
+                                null
+                            )
+                        }
+                    }
+                }
+        })
     }
 
     private fun displayItemsError() {
@@ -114,7 +135,7 @@ class StoriesActivity : AppCompatActivity() {
     private fun initSwipeToRefresh() {
         swipe_refresh_layout.setOnRefreshListener {
             viewmodel.scrollPosition = 0
-            viewmodel.fetchStories()
+            viewmodel.fetchStories(true)
         }
     }
 

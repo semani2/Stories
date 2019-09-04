@@ -26,14 +26,23 @@ class StoriesActivityViewModel(private val repository: IStoriesRepository,
         MutableLiveData<LiveDataWrapper<List<StoryEntity>, Exception>>()
     }
 
+    val availableOfflineLiveData: MutableLiveData<LiveDataWrapper<Boolean, Exception>> by lazy {
+        MutableLiveData<LiveDataWrapper<Boolean, Exception>>()
+    }
+
     var scrollPosition = 0
 
     /**
      * Method to fetch stories from the repository
      */
-    fun fetchStories() {
-        if (storiesLiveData.value != null
+    fun fetchStories(forceRefresh: Boolean = false) {
+        if (!forceRefresh && storiesLiveData.value != null
             && storiesLiveData.value?.status == ResourceStatus.SUCCESS) {
+            availableOfflineLiveData.value = LiveDataWrapper(
+                ResourceStatus.SUCCESS,
+                false,
+                null
+            )
             return
         }
 
@@ -43,7 +52,8 @@ class StoriesActivityViewModel(private val repository: IStoriesRepository,
             null
         )
 
-        val disposable = repository.getStories(!connectivityModule.isNetworkAvailable())
+        val networkAvailable = connectivityModule.isNetworkAvailable()
+        val disposable = repository.getStories(!networkAvailable)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeWith(object : DisposableSingleObserver<List<StoryEntity>>() {
@@ -61,6 +71,14 @@ class StoriesActivityViewModel(private val repository: IStoriesRepository,
                         data,
                         null
                     )
+
+                    if (networkAvailable) {
+                        availableOfflineLiveData.value = LiveDataWrapper(
+                            ResourceStatus.SUCCESS,
+                            true,
+                            null
+                        )
+                    }
                 }
 
                 override fun onError(e: Throwable) {
