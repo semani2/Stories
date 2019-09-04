@@ -5,6 +5,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.se.stories.data.db.entities.UserEntity
+import io.reactivex.Single
 
 @Dao
 interface UserDao {
@@ -16,5 +17,5 @@ interface UserDao {
     fun insertAllUsers(users: List<UserEntity>)
 
     @Query("Select * from users where name = :name")
-    fun getUserByName(name: String)
+    fun getUserByName(name: String): Single<List<UserEntity>>
 }

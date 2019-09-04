@@ -5,6 +5,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.se.stories.data.db.entities.StoryEntity
+import io.reactivex.Single
 
 @Dao
 interface StoriesDao {
@@ -16,5 +17,5 @@ interface StoriesDao {
     fun insertAllStories(users: List<StoryEntity>)
 
     @Query("SELECT * from stories")
-    fun getAllStories(userStories: List<StoryEntity>)
+    fun getAllStories(): Single<List<StoryEntity>>
 }
