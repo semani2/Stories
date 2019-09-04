@@ -31,6 +31,9 @@ class StoriesActivityTest {
     @get:Rule
     val activityRule = ActivityTestRule(StoriesActivity::class.java, false, false)
 
+    /**
+     * Tests the default start state of the application
+     */
     @Test
     fun `test_start_state`() {
         activityRule.launchActivity(null)
@@ -39,6 +42,9 @@ class StoriesActivityTest {
             .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
     }
 
+    /**
+     * Tests that all stories are successfully fetched
+     */
     @Test
     fun `test_all_stories_fetched`() {
         activityRule.launchActivity(null)
@@ -55,6 +61,10 @@ class StoriesActivityTest {
         )
     }
 
+    /**
+     * Tests that the stories are persisted when there is no network connection
+     * after the initial fetch of data when there is connection
+     */
     @Test
     fun `test_no_network_connection_items_fetched`() {
         activityRule.launchActivity(null)
@@ -88,6 +98,7 @@ class StoriesActivityTest {
     @After
     fun teardown() {
         toggleConnectivity(true)
+        IdlingRegistry.getInstance().unregister(activityRule.activity.countingIdlingResource)
     }
 
     private fun toggleConnectivity(enable: Boolean) {
