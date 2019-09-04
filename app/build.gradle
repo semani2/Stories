@@ -77,6 +77,9 @@ dependencies {
     // Palette
     implementation 'androidx.palette:palette-ktx:1.0.0'
 
+    // Stetho for debug
+    implementation 'com.facebook.stetho:stetho:1.5.1'
+
     // Junit and Test Butler
     testImplementation 'junit:junit:4.12'
     testImplementation 'androidx.test.ext:junit:1.1.1'

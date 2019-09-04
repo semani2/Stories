@@ -1,6 +1,7 @@
 package com.se.stories
 
 import android.app.Application
+import com.facebook.stetho.Stetho
 import com.se.stories.module.ApiModule
 import com.se.stories.module.ConnectivityModule
 import com.se.stories.module.DbModule
@@ -29,6 +30,7 @@ class StoriesApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         initTimber()
+        //initStetho()
 
         startKoin {
             androidLogger()
@@ -40,4 +42,9 @@ class StoriesApplication : Application() {
     private fun initTimber() {
         Timber.plant(Timber.DebugTree())
     }
+
+    // Only For Debug
+    /*private fun initStetho() {
+        Stetho.initializeWithDefaults(this)
+    }*/
 }
