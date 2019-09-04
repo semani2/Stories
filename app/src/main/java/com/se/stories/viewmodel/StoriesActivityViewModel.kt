@@ -32,6 +32,11 @@ class StoriesActivityViewModel(private val repository: IStoriesRepository,
      * Method to fetch stories from the repository
      */
     fun fetchStories() {
+        if (storiesLiveData.value != null
+            && storiesLiveData.value?.status == ResourceStatus.SUCCESS) {
+            return
+        }
+
         storiesLiveData.value = LiveDataWrapper(
             ResourceStatus.LOADING,
             null,
