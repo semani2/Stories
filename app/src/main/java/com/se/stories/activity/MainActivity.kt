@@ -1,7 +1,8 @@
-package com.se.stories
+package com.se.stories.activity
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import com.se.stories.R
 
 class MainActivity : AppCompatActivity() {
 
