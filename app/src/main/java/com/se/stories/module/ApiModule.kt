@@ -1,5 +1,6 @@
-package com.se.stories.data.api
+package com.se.stories.module
 
+import com.se.stories.data.api.ApiInterface
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
