@@ -5,6 +5,9 @@ import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 
+/**
+ * Api Module provides the retrofit interface to fetch stories from the Wattpad API
+ */
 class ApiModule {
 
     fun getStoriesApi(): ApiInterface {

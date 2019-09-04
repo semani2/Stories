@@ -1,4 +1,4 @@
-package com.se.stories.data.api
+package com.se.stories.data.api.models
 
 import com.google.gson.annotations.SerializedName
 

@@ -1,5 +1,6 @@
 package com.se.stories.data.api
 
+import com.se.stories.data.api.models.Stories
 import io.reactivex.Single
 import retrofit2.http.GET
 
