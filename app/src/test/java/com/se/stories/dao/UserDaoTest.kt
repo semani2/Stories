@@ -1,11 +1,9 @@
 package com.se.stories.dao
 
-import android.content.Context
-import androidx.room.Room
-import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.se.stories.data.db.StoriesDatabase
+import com.se.stories.data.db.StoriesDao
 import com.se.stories.data.db.UserDao
+import com.se.stories.data.db.entities.StoryEntity
 import com.se.stories.data.db.entities.UserEntity
 import junit.framework.Assert.assertEquals
 import org.junit.After
@@ -17,44 +15,7 @@ import org.junit.runner.RunWith
  * Unit Tests for the UserDao
  */
 @RunWith(AndroidJUnit4::class)
-class UserDaoTest {
-
-    private lateinit var userDao: UserDao
-    private lateinit var db: StoriesDatabase
-
-    private var testUser1 = UserEntity(
-        "user_name_1",
-        "avatar",
-        "User1"
-    )
-
-    private var testUser2 = UserEntity(
-        "user_name_2",
-        "avatar",
-        "User2"
-    )
-
-    private var testUser3 = UserEntity(
-        "user_name_3",
-        "avatar",
-        "User3"
-    )
-
-    @Before
-    fun createDb() {
-        val context = ApplicationProvider.getApplicationContext<Context>()
-        db = Room.inMemoryDatabaseBuilder(context,
-            StoriesDatabase::class.java)
-            .allowMainThreadQueries()
-            .build()
-
-        userDao = db.userDao()
-    }
-
-    @After
-    fun closeDb() {
-        db.close()
-    }
+class UserDaoTest : BaseDaoTest() {
 
     /**
      * Tests that the UserDao returns an empty list for getUserByName()
@@ -118,5 +79,44 @@ class UserDaoTest {
 
         val newDbUsers = userDao.getAllUsers().blockingGet()
         assertEquals(newDbUsers.size, 0)
+    }
+
+    /**
+     * Tests that deleting an user, deletes their stories
+     * respecting the foreign key constraint
+     */
+    @Test
+    fun `test_deleting_user_deletes_corresponding_stories`() {
+        val users = mutableListOf<UserEntity>()
+        users.add(testUser1)
+        users.add(testUser2)
+        users.add(testUser3)
+
+        userDao.insertAllUsers(users)
+        val dbUsers = userDao.getAllUsers().blockingGet()
+        assertEquals(dbUsers.size, 3)
+
+        insertTestStories()
+        val dbStories = storiesDao.getAllStories().blockingGet()
+        assertEquals(dbStories.size, 3)
+
+        userDao.deleteAllUsers()
+        val newDbUsers = userDao.getAllUsers().blockingGet()
+        assertEquals(newDbUsers.size, 0)
+
+        val deletedDbStories = storiesDao.getAllStories().blockingGet()
+        assertEquals(deletedDbStories.size, 0)
+    }
+
+    /**
+     * Helper method to insert test stories into database
+     */
+    private fun insertTestStories() {
+        val stories = mutableListOf<StoryEntity>()
+        stories.add(testStory1)
+        stories.add(testStory2)
+        stories.add(testStory3)
+
+        storiesDao.insertAllStories(stories)
     }
 }
