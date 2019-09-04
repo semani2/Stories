@@ -3,17 +3,22 @@ package com.se.stories.activity
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
 import com.se.stories.R
 import com.se.stories.adapter.StoryAdapter
 import com.se.stories.data.db.entities.StoryEntity
 import com.se.stories.module.ConnectivityModule
+import com.se.stories.viewmodel.LiveDataWrapper
+import com.se.stories.viewmodel.ResourceStatus
 import com.se.stories.viewmodel.StoriesActivityViewModel
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.observers.DisposableObserver
 import kotlinx.android.synthetic.main.activity_stories.*
 import org.koin.android.ext.android.inject
 import org.koin.android.viewmodel.ext.android.viewModel
+import timber.log.Timber
 
 class StoriesActivity : AppCompatActivity() {
 
@@ -31,11 +36,16 @@ class StoriesActivity : AppCompatActivity() {
         setContentView(R.layout.activity_stories)
 
         initRecyclerView()
+        initSwipeToRefresh()
         initStoryItemClick()
         initLiveDataObservers()
+
+        viewmodel.fetchStories()
     }
 
     override fun onDestroy() {
+        viewmodel.scrollPosition = (stories_recycler_view.layoutManager as GridLayoutManager)
+            .findFirstCompletelyVisibleItemPosition()
         compositeDisposable.dispose()
         super.onDestroy()
     }
@@ -46,7 +56,47 @@ class StoriesActivity : AppCompatActivity() {
      * Method to initialize the ViewModels' live data observers
      */
     private fun initLiveDataObservers() {
+        viewmodel.storiesLiveData.observe(this,
+            Observer<LiveDataWrapper<List<StoryEntity>, Exception>> { livedataWrapper ->
+                when (livedataWrapper.status) {
+                    ResourceStatus.LOADING -> toggleBusy(true)
 
+                    ResourceStatus.ERROR -> {
+                        swipe_refresh_layout.isRefreshing = false
+                        toggleBusy(false)
+                        Timber.e(livedataWrapper.exception, "Error fetching items")
+
+                        displayItemsError()
+                    }
+
+                    ResourceStatus.SUCCESS -> {
+                        swipe_refresh_layout.isRefreshing = false
+                        toggleBusy(false)
+
+                        if (livedataWrapper.data.isNullOrEmpty()) {
+                            displayItemsError()
+                            return@Observer
+                        }
+
+                        storiesList.clear()
+                        storiesList.addAll(livedataWrapper.data)
+                        storyAdapter.notifyDataSetChanged()
+
+                        stories_recycler_view.visibility = View.VISIBLE
+                        empty_list_text_view.visibility = View.GONE
+
+                        stories_recycler_view.smoothScrollToPosition(viewmodel.scrollPosition)
+                    }
+                }
+        })
+    }
+
+    private fun displayItemsError() {
+        stories_recycler_view.visibility = View.GONE
+        if (!connectivityModule.isNetworkAvailable()) {
+            empty_list_text_view.text = getString(R.string.str_empty_list_no_network)
+        }
+        empty_list_text_view.visibility = View.VISIBLE
     }
 
     /* Section - UI Handlers */
@@ -61,6 +111,13 @@ class StoriesActivity : AppCompatActivity() {
         }
     }
 
+    private fun initSwipeToRefresh() {
+        swipe_refresh_layout.setOnRefreshListener {
+            viewmodel.scrollPosition = 0
+            viewmodel.fetchStories()
+        }
+    }
+
     /**
      * Helper method to initialize the click event for each
      */
@@ -71,8 +128,8 @@ class StoriesActivity : AppCompatActivity() {
                     /* no op */
                 }
 
-                override fun onNext(t: StoryEntity) {
-                    // TODO :: Story Detail page
+                override fun onNext(story: StoryEntity) {
+                    Toast.makeText(this@StoriesActivity, story.title, Toast.LENGTH_SHORT).show()
                 }
 
                 override fun onError(e: Throwable) {

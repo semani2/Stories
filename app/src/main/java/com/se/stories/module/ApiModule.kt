@@ -1,5 +1,6 @@
 package com.se.stories.module
 
+import com.se.stories.BuildConfig
 import com.se.stories.data.api.ApiInterface
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
@@ -15,7 +16,7 @@ class ApiModule {
 
         val retrofit = Retrofit.Builder()
             .client(OkHttpClient.Builder().build())
-            .baseUrl("https://www.wattpad.com/api/v3/stories?offset=0&limit=10&fields=stories(id,title,cover,user)&filter=new")
+            .baseUrl(BuildConfig.API_URL)
             .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
             .addConverterFactory(GsonConverterFactory.create())
             .build()

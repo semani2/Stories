@@ -1,6 +1,6 @@
 package com.se.stories.repository
 
-import com.se.stories.data.model.UserStory
+import com.se.stories.data.db.entities.StoryEntity
 import io.reactivex.Single
 
 /**
@@ -8,8 +8,8 @@ import io.reactivex.Single
  */
 interface IStoriesRepository {
 
-    fun getStories(): Single<List<UserStory>>
+    fun getStories(useCacheOnly: Boolean): Single<List<StoryEntity>>
 
-    fun getStoryById(id: String): Single<UserStory>
+    fun getStoryById(id: String): Single<List<StoryEntity>>
 
 }

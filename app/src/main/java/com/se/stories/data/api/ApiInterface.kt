@@ -9,6 +9,6 @@ import retrofit2.http.GET
  */
 interface ApiInterface {
 
-    @GET
+    @GET("stories?offset=0&limit=10&fields=stories(id,title,cover,user)&filter=new")
     fun getStories() : Single<Stories>
 }

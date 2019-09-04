@@ -11,11 +11,14 @@ import io.reactivex.Single
 interface StoriesDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertStory(story: StoryEntity)
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAllStories(users: List<StoryEntity>)
 
     @Query("SELECT * from stories")
     fun getAllStories(): Single<List<StoryEntity>>
+
+    @Query("SELECT * from stories where id = :id")
+    fun getStoryById(id: String): Single<List<StoryEntity>>
+
+    @Query("DELETE from users")
+    fun deleteAllStories()
 }

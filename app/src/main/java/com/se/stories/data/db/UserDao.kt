@@ -11,11 +11,11 @@ import io.reactivex.Single
 interface UserDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertUser(user: UserEntity)
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAllUsers(users: List<UserEntity>)
 
     @Query("Select * from users where name = :name")
     fun getUserByName(name: String): Single<List<UserEntity>>
+
+    @Query("DELETE from users")
+    fun deleteAllUsers()
 }
