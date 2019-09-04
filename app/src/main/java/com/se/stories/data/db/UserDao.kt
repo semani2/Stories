@@ -18,4 +18,7 @@ interface UserDao {
 
     @Query("DELETE from users")
     fun deleteAllUsers()
+
+    @Query("SELECT * from users")
+    fun getAllUsers(): Single<List<UserEntity>>
 }
